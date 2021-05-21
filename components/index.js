@@ -16,7 +16,6 @@ const Bundle = () => {
     },
   ]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [clientVisible, setClientVisible] = useState(false);
   const [newClient, setNewClient] = useState('');
 
   // const handleAdd = (client) => {
