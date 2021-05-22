@@ -1,9 +1,54 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-filename-extension */
 import React, { useState } from 'react';
-import { Text, View } from 'react-native';
-import { Icon } from 'react-native-elements';
+import styled from 'styled-components';
+import { Text, View, ImageBackground } from 'react-native';
 import GoalCheck from './GoalCheck';
+
+const Name = styled.Text`
+  padding-top: 40px;
+  padding-left: 20px;
+  font-size: 50px;
+`;
+
+const CGHeader = styled.TouchableOpacity`
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  borderBottomColor: black;
+`;
+
+const ListContainer = styled.View`
+  padding: 20px;
+  margin: 10px;
+  border: 1px solid #989bb3;
+  background: rgba(255, 255, 255, 0.4);
+`;
+
+const ListText = styled.Text`
+  font-size: 15px;
+  color: black;
+`;
+
+const Button = styled.TouchableOpacity`
+  position: absolute;
+  right: 20px;
+  top: 30px;
+  backgroundColor: #989bb3;
+  height: 100px;
+  width: 200px;
+  border-radius: 30px;
+  padding: 10px;
+  margin-right: 10px;
+  border: 2px solid #5feafa;
+`;
+
+const ButtonText = styled.Text`
+  color: white;
+  padding-top: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center
+`;
 
 const ClientGoals = ({
   client, clientVisible, setClientVisible, clientGoals,
@@ -47,27 +92,34 @@ const ClientGoals = ({
     },
   ]);
   const [check, setCheck] = useState(false);
+  const [color, setColor] = useState(false);
 
   const EntryList = () => entries.map((entry, i) => (
     <View key={i}>
-      <Text>{entry.date}</Text>
-      <Text>{entry.title}</Text>
+      <ListContainer>
+        <ListText>{entry.date}</ListText>
+        <ListText>{entry.title}</ListText>
+      </ListContainer>
     </View>
   ));
   if (check === false) {
     return (
-      <View>
-        <Text onPress={() => setClientVisible(!clientVisible)}>{client}</Text>
-        <Icon
-          reverse
-          name="add"
-          type="material"
-          color="#1e96eb"
-          size={10}
-          onPress={() => setCheck(!check)}
-        />
+      <ImageBackground
+        style={[{ flex: 1, padding: 0, width: 450 }, { flexDirection: 'column' }]}
+        source={require('../assets/background.png')}
+      >
+        <CGHeader>
+          <Name onPress={() => setClientVisible(!clientVisible)}>{client}</Name>
+          <Button
+            onPress={() => setCheck(!check)}
+            onPressIn={() => setColor(true)}
+            onPressOut={() => setColor(false)}
+          >
+            <ButtonText>New Goal +</ButtonText>
+          </Button>
+        </CGHeader>
         <EntryList />
-      </View>
+      </ImageBackground>
     );
   }
   return (
@@ -80,4 +132,10 @@ const ClientGoals = ({
   );
 };
 
+// const styles = StyleSheet.create({
+
+// });
+
 export default ClientGoals;
+
+// onPress={() => setCheck(!check)}

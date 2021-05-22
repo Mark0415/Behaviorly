@@ -138,9 +138,6 @@ const ListContainer = styled.View`
   flex: 2;
 `;
 
-const Hi = styled.TouchableOpacity`
-`;
-
 const Item = styled.Text`
   text-align: center;
   font-weight: bold;
