@@ -1,10 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-filename-extension */
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Text, TextInput, View, SectionList,
 } from 'react-native';
 import styled from 'styled-components';
+import moment from 'moment';
+import { BehaviorlyContext } from './context/BehaviorContext.jsx';
 
 const Search = styled.TextInput`
   width: 200px;
@@ -30,45 +32,69 @@ const Header = styled.Text`
   padding: 0;
 `;
 
-const GoalCheck = ({ clientGoals, check, setCheck }) => {
-  const List = () => clientGoals[0].goals.map((entry, i) => (
-    <View
-      style={[{ flex: 1, padding: 0 }, { flexDirection: 'row' }]}
-      key={i}
-    >
-      <SectionList
-        sections={[
-          {
-            title: entry,
-            data: [
-              { name: 'Met', colorCode: '#82F7BC' },
-              { name: 'Not Met', colorCode: '#FB3134' },
-              { name: 'N/A', colorCode: '#7ABEFF' },
-            ],
-          },
-        ]}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({ item }) => (
-          <View style={{ flex: 1, margin: 10 }}>
-            <Met
-              onPress={() => console.log(item)}
-              style={{ backgroundColor: item.colorCode }}
-            >
-              {item.name}
-            </Met>
-          </View>
-        )}
-        renderSectionHeader={({ section }) => (
-          <Header>{section.title}</Header>
-        )}
-      />
-    </View>
-  ));
+const GoalCheck = ({ check, setCheck }) => {
+  const { clientGoalList, clientList, person } = useContext(BehaviorlyContext);
+  const [clientGoals, setClientGoals] = clientGoalList;
+  const [clients, setClients] = clientList;
+  const [clientName, setClientName] = person;
+  const [inputContainer, setInputContainer] = useState([]);
+  const [input, setInput] = useState('');
+
+  const addToContainer = (title, status) => {
+    const inputValue = { goal: title, status };
+    if (inputValue.goal === undefined) {
+      setInputContainer((oldInputContainer) => [...oldInputContainer, inputValue]);
+    }
+  };
+
+  // const addEntry = () => {
+  //   const date = new Date();
+  //   const entry = {
+  //     title: input,
+  //     date: moment(date).format('MMMM Do YYYY'),
+  //     goals: inputContainer,
+  //   };
+  //   clientGoals((oldGoals) => ({ ...oldGoals, [clientName]: { currentGoals: } }));
+  // };
+
+  const List = () => (
+    clients.map((client) => (
+      client.name === clientName ? client.goals.map((entry, j) => (
+        <SectionList
+          key={j}
+          sections={[
+            {
+              title: entry,
+              data: [
+                { name: 'Met', colorCode: '#82F7BC' },
+                { name: 'Not Met', colorCode: '#FB3134' },
+                { name: 'N/A', colorCode: '#7ABEFF' },
+              ],
+            },
+          ]}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({ item }) => (
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <Met
+                onPress={() => addToContainer(entry, item.name)}
+                style={{ flex: 1, backgroundColor: item.colorCode }}
+              >
+                {item.name}
+              </Met>
+            </View>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Header onPress={() => console.log('this is', inputContainer)}>{section.title}</Header>
+          )}
+        />
+      )) : null
+    )));
+
   return (
     <View>
       <Search
         placeholder="Brief summarized title"
-        style={{ flex: 1 }}
+        onChangeText={(title) => setInput(title)}
       />
       <List />
       <Text onPress={() => setCheck(!check)}>{'I\'m all done!'}</Text>

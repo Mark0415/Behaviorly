@@ -2,88 +2,15 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-filename-extension */
-import React, { useState } from 'react';
-import { Icon } from 'react-native-elements';
+import React, { useState, useContext } from 'react';
 import {
   View, Text, TextInput, ImageBackground, TouchableOpacity,
 } from 'react-native';
 import styled from 'styled-components';
 import GoalCreate from './GoalCreate';
 import ClientGoals from './ClientGoals';
+import { BehaviorlyContext } from './context/BehaviorContext.jsx';
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flexDirection: 'column',
-//     backgroundColor: '#695380',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//   },
-//   background: {
-//     flex: 1,
-//   },
-//   names: {
-//     textAlign: 'center',
-//     fontWeight: 'bold',
-//     width: '100%',
-//     fontSize: 45,
-//     padding: 20,
-//     margin: 20,
-//     borderWidth: 1,
-//     borderRadius: 25,
-//     borderColor: 'black',
-//     backgroundColor: '#a465e6',
-//   },
-//   button: {
-//     position: 'absolute',
-//     right: 0,
-//     color: 'white',
-//     alignItems: 'center',
-//     backgroundColor: '#2c0078',
-//     height: 40,
-//     width: 40,
-//     borderRadius: 25,
-//     padding: 10,
-//   },
-//   search: {
-//     padding: 10,
-//     height: 40,
-//     width: 200,
-//     margin: 12,
-//     borderWidth: 1,
-//     borderColor: 'black',
-//     borderRadius: 6,
-//   },
-//   image: {
-//     flex: 1,
-//     resizeMode: 'cover',
-//     justifyContent: 'center',
-//   },
-//   modalView: {
-//     backgroundColor: 'white',
-//     height: '100%',
-//     borderRadius: 20,
-//     padding: 35,
-//     alignItems: 'center',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 2,
-//     },
-//     shadowOpacity: 0.25,
-//     shadowRadius: 4,
-//     elevation: 5,
-//   },
-//   modalText: {
-//     marginBottom: 15,
-//     textAlign: 'center',
-//   },
-//   textStyle: {
-//     color: 'white',
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//   },
-// });
 const Container = styled.View`
   display: flex;
   background-color: white;
@@ -149,29 +76,28 @@ const Item = styled.Text`
   backgroundColor: #a465e6;
 `;
 
-const ClientScreen = ({
-  clientGoals, setModalVisible, setNewClient, modalVisible,
-  newClient, setClientGoals,
-}) => {
-  const [namePlaceholder, setNamePlaceholder] = useState('');
-  const [clientVisible, setClientVisible] = useState(false);
-  const [goalsMet] = useState([]);
+const ClientScreen = () => {
+  const { clientList, visible, person } = useContext(BehaviorlyContext);
+  const [clients] = clientList;
+  const [clientVisible, setClientVisible] = visible;
+  const [, setClientName] = person;
+  const [newClient, setNewClient] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const goalTrack = (name) => clientGoals.map((client, i) => (
-    client.name === name
-      ? client.goals.map((entry, j) => (
-        <View key={i}>
-          <Text key={j}>{entry}</Text>
-        </View>
-      ))
-      : null
+  const goalTrack = (name) => clients.map((client, i) => (
+    client.name === name ? client.goals.map((entry, j) => (
+      <View key={i}>
+        <Text key={j}>{entry}</Text>
+      </View>
+    )) : null
   ));
-  const List = () => clientGoals.map((client, i) => (
+
+  const List = () => clients.map((client, i) => (
     <Item
       key={i}
       onPress={() => {
         setClientVisible(!clientVisible);
-        setNamePlaceholder(client.name);
+        setClientName(client.name);
         goalTrack(client.name);
       }}
     >
@@ -200,10 +126,9 @@ const ClientScreen = ({
         {modalVisible === true ? (
           <GoalCreate
             modalVisible={modalVisible}
-            newClient={newClient}
             setModalVisible={setModalVisible}
+            newClient={newClient}
             setNewClient={setNewClient}
-            setClientGoals={setClientGoals}
           />
         ) : null }
         <ListContainer>
@@ -213,13 +138,7 @@ const ClientScreen = ({
     );
   }
   return (
-    <ClientGoals
-      clientVisible={clientVisible}
-      setClientVisible={setClientVisible}
-      clientGoals={clientGoals}
-      goalsMet={goalsMet}
-      client={namePlaceholder}
-    />
+    <ClientGoals />
   );
 };
 

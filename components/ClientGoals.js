@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-filename-extension */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { Text, View, ImageBackground } from 'react-native';
+import { View, ImageBackground, TouchableOpacity } from 'react-native';
+import { BehaviorlyContext } from './context/BehaviorContext.jsx';
 import GoalCheck from './GoalCheck';
+import GoalItem from './GoalItem';
 
 const Name = styled.Text`
   padding-top: 40px;
@@ -50,58 +52,43 @@ const ButtonText = styled.Text`
   text-align: center
 `;
 
-const ClientGoals = ({
-  client, clientVisible, setClientVisible, clientGoals,
-}) => {
-  const [entries, setEntries] = useState([
-    {
-      title: 'Volunteer Work/Art Class',
-      date: '5/12/2021',
-      goalList: {
-        goalOne: {
-          goal: 'Don\'t eat too much',
-          status: 'N/A',
-        },
-        goalTwo: {
-          goal: 'Wash hands',
-          status: 'Met',
-        },
-        goalThree: {
-          goal: 'Don\'t take things too personal',
-          status: 'N/A',
-        },
-      },
-    },
-    {
-      title: 'Exercise at Lake Merrit/ Oakland Library Tutor',
-      date: '5/11/2021',
-      goalList: {
-        goalOne: {
-          goal: 'Don\'t eat too much',
-          status: 'N/A',
-        },
-        goalTwo: {
-          goal: 'Wash hands',
-          status: 'Met',
-        },
-        goalThree: {
-          goal: 'Don\'t take things too personal',
-          status: 'N/A',
-        },
-      },
-    },
-  ]);
+const ClientGoals = () => {
+  const { clientGoalList, visible, person } = useContext(BehaviorlyContext);
+  const [clientVisible, setClientVisible] = visible;
+  const [clientName] = person;
+  const [clientGoals] = clientGoalList;
   const [check, setCheck] = useState(false);
-  const [color, setColor] = useState(false);
+  const [modalGoal, setModalGoal] = useState(false);
+  const [date, setDate] = useState('');
 
-  const EntryList = () => entries.map((entry, i) => (
-    <View key={i}>
+  const goals = clientGoals[clientName].currentGoals;
+
+  const EntryList = () => goals.map((entry, i) => (
+    <TouchableOpacity
+      key={i}
+      onPress={() => {
+        setModalGoal(!modalGoal);
+        setDate(entry.date);
+      }}
+    >
       <ListContainer>
         <ListText>{entry.date}</ListText>
         <ListText>{entry.title}</ListText>
       </ListContainer>
-    </View>
+    </TouchableOpacity>
   ));
+
+  if (modalGoal === true) {
+    return (
+      <GoalItem
+        date={date}
+        modalGoal={modalGoal}
+        setDate={setDate}
+        setModalGoal={setModalGoal}
+      />
+    );
+  }
+
   if (check === false) {
     return (
       <ImageBackground
@@ -109,11 +96,9 @@ const ClientGoals = ({
         source={require('../assets/background.png')}
       >
         <CGHeader>
-          <Name onPress={() => setClientVisible(!clientVisible)}>{client}</Name>
+          <Name onPress={() => setClientVisible(!clientVisible)}>{clientName}</Name>
           <Button
             onPress={() => setCheck(!check)}
-            onPressIn={() => setColor(true)}
-            onPressOut={() => setColor(false)}
           >
             <ButtonText>New Goal +</ButtonText>
           </Button>
@@ -124,8 +109,6 @@ const ClientGoals = ({
   }
   return (
     <GoalCheck
-      clientGoals={clientGoals}
-      client={client}
       check={check}
       setCheck={setCheck}
     />
