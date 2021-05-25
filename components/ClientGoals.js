@@ -62,6 +62,7 @@ const ClientGoals = () => {
   const [date, setDate] = useState('');
 
   const goals = clientGoals[clientName].currentGoals;
+  console.log('goals', clientGoals['Annika']);
 
   const EntryList = () => goals.map((entry, i) => (
     <TouchableOpacity
@@ -107,6 +108,8 @@ const ClientGoals = () => {
       </ImageBackground>
     );
   }
+  console.log('CLIENT GOALS');
+
   return (
     <GoalCheck
       check={check}

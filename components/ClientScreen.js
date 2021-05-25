@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React, { useState, useContext } from 'react';
 import {
-  View, Text, TextInput, ImageBackground, TouchableOpacity,
+  View, Text, TextInput, ImageBackground, TouchableOpacity, ScrollView,
 } from 'react-native';
 import styled from 'styled-components';
 import GoalCreate from './GoalCreate';
@@ -32,7 +32,7 @@ const Title = styled.Text`
 const Button = styled.TouchableOpacity`
   position: absolute;
   right: 20px;
-  top: 140px;
+  top: 160px;
   backgroundColor: #989bb3;
   height: 60px;
   width: 60px;
@@ -50,11 +50,11 @@ const ButtonText = styled.Text`
 
 const Search = styled.TextInput`
   position: absolute;
-  top: 140px;
+  top: 160px;
   left: 100px;
   padding: 10px;
   height: 40px;
-  width: 200px;
+  width: 250px;
   margin: 12px;
   border: 1px solid black;
   border-radius: 20px;
@@ -68,12 +68,17 @@ const ListContainer = styled.View`
 const Item = styled.Text`
   text-align: center;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 30px;
   padding: 20px;
   margin: 20px;
-  border: 2px solid black;
   border-radius: 50px;
-  backgroundColor: #a465e6;
+  background-color: #989bb3;
+  border: 2px solid #5feafa;
+`;
+
+const Entry = styled.Text`
+  font-size: 20px;
+  text-align: left;
 `;
 
 const ClientScreen = () => {
@@ -87,7 +92,7 @@ const ClientScreen = () => {
   const goalTrack = (name) => clients.map((client, i) => (
     client.name === name ? client.goals.map((entry, j) => (
       <View key={i}>
-        <Text key={j}>{entry}</Text>
+        <Entry key={j}>{entry}</Entry>
       </View>
     )) : null
   ));
@@ -95,6 +100,7 @@ const ClientScreen = () => {
   const List = () => clients.map((client, i) => (
     <Item
       key={i}
+      keyExtractor={(item, index) => item + index}
       onPress={() => {
         setClientVisible(!clientVisible);
         setClientName(client.name);
@@ -104,6 +110,11 @@ const ClientScreen = () => {
       {client.name}
     </Item>
   ));
+
+  const addHandler = () => {
+    setModalVisible(true);
+    setNewClient('');
+  };
 
   if (clientVisible === false) {
     return (
@@ -115,6 +126,7 @@ const ClientScreen = () => {
               <Search
                 placeholder="enter name"
                 onChangeText={(name) => setNewClient(name)}
+                value={newClient}
               />
               <Button onPress={() => setModalVisible(true)}>
                 <ButtonText>+</ButtonText>
@@ -137,6 +149,8 @@ const ClientScreen = () => {
       </Container>
     );
   }
+  console.log('THIS IS CLIENT SCREEN');
+
   return (
     <ClientGoals />
   );

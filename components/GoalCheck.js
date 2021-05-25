@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React, { useState, useContext } from 'react';
 import {
-  Text, TextInput, View, SectionList,
+  Text, TextInput, View, SectionList, ScrollView, ImageBackground,
 } from 'react-native';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -17,6 +17,7 @@ const Search = styled.TextInput`
 
 const ListContainer = styled.View`
   justifyContent: flex-end;
+  height: 100px;
 `;
 
 const Met = styled.Text`
@@ -32,36 +33,64 @@ const Header = styled.Text`
   padding: 0;
 `;
 
+const ButtonContainer = styled.TouchableOpacity`
+  background-color: #989bb3;
+  border: 2px solid #5feafa;
+  border-radius: 20px;
+  padding: 15px;
+  position: absolute;
+  height: 60px;
+  width: 200px;
+  bottom: 20px;
+`;
+
+const Button = styled.Text`
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+`;
+
+const Background = styled.ImageBackground`
+  width: 200px;
+`;
+
 const GoalCheck = ({ check, setCheck }) => {
   const { clientGoalList, clientList, person } = useContext(BehaviorlyContext);
-  const [clientGoals, setClientGoals] = clientGoalList;
-  const [clients, setClients] = clientList;
-  const [clientName, setClientName] = person;
+  const [, setClientGoals] = clientGoalList;
+  const [clients] = clientList;
+  const [clientName] = person;
   const [inputContainer, setInputContainer] = useState([]);
   const [input, setInput] = useState('');
 
   const addToContainer = (title, status) => {
     const inputValue = { goal: title, status };
-    if (inputValue.goal === undefined) {
-      setInputContainer((oldInputContainer) => [...oldInputContainer, inputValue]);
-    }
+    setInputContainer((oldInputContainer) => [...oldInputContainer, inputValue]);
   };
 
-  // const addEntry = () => {
-  //   const date = new Date();
-  //   const entry = {
-  //     title: input,
-  //     date: moment(date).format('MMMM Do YYYY'),
-  //     goals: inputContainer,
-  //   };
-  //   clientGoals((oldGoals) => ({ ...oldGoals, [clientName]: { currentGoals: } }));
-  // };
+  const addEntry = () => {
+    const date = new Date();
+    const entry = {
+      title: input,
+      date: moment(date).format('MMMM Do YYYY'),
+      goals: inputContainer,
+    };
+    setClientGoals((prevGoals) => ({
+      ...prevGoals,
+      [clientName]: {
+        ...prevGoals[clientName], currentGoals: [...prevGoals[clientName].currentGoals, entry],
+      },
+    }));
+    console.log('this is entry', entry);
+  };
+
+  console.log(input);
+  console.log('this is container', inputContainer);
+  // console.log('this is clientGoals', clientGoals['Annika'].currentGoals);
 
   const List = () => (
-    clients.map((client) => (
+    clients.map((client, i) => (
       client.name === clientName ? client.goals.map((entry, j) => (
         <SectionList
-          key={j}
           sections={[
             {
               title: entry,
@@ -74,30 +103,39 @@ const GoalCheck = ({ check, setCheck }) => {
           ]}
           keyExtractor={(item, index) => item + index}
           renderItem={({ item }) => (
-            <View style={{ flex: 1, flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'column' }}>
               <Met
                 onPress={() => addToContainer(entry, item.name)}
-                style={{ flex: 1, backgroundColor: item.colorCode }}
+                style={{ flex: 1, backgroundColor: item.colorCode, borderRadius: 20 }}
               >
                 {item.name}
               </Met>
             </View>
           )}
           renderSectionHeader={({ section }) => (
-            <Header onPress={() => console.log('this is', inputContainer)}>{section.title}</Header>
+            <Header>{section.title}</Header>
           )}
         />
       )) : null
     )));
 
+  const completeForm = () => {
+    addEntry();
+    setCheck(!check);
+  };
+
   return (
     <View>
-      <Search
-        placeholder="Brief summarized title"
-        onChangeText={(title) => setInput(title)}
-      />
+      <ListContainer>
+        <Search
+          placeholder="Brief summarized title"
+          onChangeText={(title) => setInput(title)}
+        />
+      </ListContainer>
       <List />
-      <Text onPress={() => setCheck(!check)}>{'I\'m all done!'}</Text>
+      <ButtonContainer>
+        <Button onPress={completeForm}>{'I\'m all done!'}</Button>
+      </ButtonContainer>
     </View>
   );
 };
